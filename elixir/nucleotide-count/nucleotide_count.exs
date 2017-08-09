@@ -8,12 +8,12 @@ defmodule NucleotideCount do
     end
 
     defp count_p([h|t], nucleotide, cnt) do
-        cond do
-            h == nucleotide ->
+        case h do
+            ^nucleotide ->
                 count_p(t, nucleotide, cnt+1)
-            h != nucleotide -> 
+            _ ->
                 count_p(t, nucleotide, cnt)
-        end    
+        end
     end
 
     def histogram(string) do
@@ -25,16 +25,12 @@ defmodule NucleotideCount do
     end
 
     defp histogram_p([h|t], map) do
-        cond do
-            h == ?A ->
-                histogram_p(t, %{map | ?A => map[?A]+1})
-            h == ?C -> 
-                histogram_p(t, %{map | ?C => map[?C]+1})
-            h == ?G ->
-                histogram_p(t, %{map | ?G => map[?G]+1})
-            h == ?T -> 
-                histogram_p(t, %{map | ?T => map[?T]+1})               
-        end          
+        case h do
+            ?A -> histogram_p(t, %{map | ?A => map[?A]+1})
+            ?C -> histogram_p(t, %{map | ?C => map[?C]+1})
+            ?G -> histogram_p(t, %{map | ?G => map[?G]+1})
+            ?T -> histogram_p(t, %{map | ?T => map[?T]+1})
+        end         
     end
 
 

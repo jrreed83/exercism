@@ -1,6 +1,7 @@
 Code.load_file("nucleotide_count.exs", __DIR__)
 
 ExUnit.start
+ExUnit.configure trace: true, exclude: :pending
 
 defmodule NucleotideCountTest do
     use ExUnit.Case
