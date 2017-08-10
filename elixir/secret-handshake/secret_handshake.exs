@@ -13,6 +13,7 @@ defmodule SecretHandshake do
 
     def commands(cmd) do
 
+        # Start by determining whether we need to reverse the list
         if (cmd &&& 0b10000) == 0b10000 do
             Enum.reverse(command_p(cmd &&& 0b01111, [], 1))
         else
