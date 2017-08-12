@@ -1,6 +1,6 @@
 defmodule Mutex do
     def create() do
-        spawn fn() -> loop() end
+        spawn(fn() -> loop() end)
     end
 
     defp loop() do
@@ -22,5 +22,13 @@ defmodule Mutex do
     def unlock(pid) do
         send(pid, {self(), :unlock})
     end
+
+    def task(pid) do
+        lock(pid)        
+        :timer.sleep(1000)
+        IO.puts("Message from process #{inspect self()}")
+        unlock(pid)
+    end
 end
+
 
