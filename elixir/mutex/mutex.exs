@@ -5,22 +5,22 @@ defmodule Mutex do
 
     defp loop() do
         receive do
-            {:lock,   pid} -> send(pid, {:ok, self()})
-            {:unlock, pid} -> send(pid, {:ok, self()})        
+            {pid, :lock} -> send(pid, {self(), :ok})
+            receive do
+                {^pid, :unlock} -> loop() 
+            end
         end
-        loop()
     end
 
     def lock(pid) do
-        send(pid, {:lock, self()})
+        send(pid, {self(), :lock})
         receive do
-            {:ok, _} -> "Yay"    
+            {^pid, :ok} -> "Yay"    
         end
     end
 
     def unlock(pid) do
-
-        send(pid, {:unlock, self()})
+        send(pid, {self(), :unlock})
     end
 end
 
