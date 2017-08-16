@@ -48,25 +48,21 @@ defmodule Semaphore do
     end
 
     def loop(n) do
-        if n == -1 do
-            receive do
-                {sender, :release} ->
-                    send(sender, {self(), :ok}) 
-                    loop(0)
-            end
-        else
-            receive do
-                {sender, :release} -> 
-                    send(sender, {self(), :ok})
-                    loop(n+1)
-                {sender, :acquire} ->
-                    if n == 0 do
-                        loop(-1)
-                    else
-                        send(sender, {self(), :ok})
-                        loop(n-1) 
+        
+        receive do
+            {sender, :release} -> 
+                send(sender, {self(), :ok})
+                loop(n+1)
+            {sender, :acquire} ->
+                if n == 0 do
+                    receive do 
+                        {_, :release} -> send(sender, {self(), :ok})
+                        loop(n+1) 
                     end
-            end
+                else
+                    send(sender, {self(), :ok})
+                    loop(n-1) 
+                end
         end
     end
 end
