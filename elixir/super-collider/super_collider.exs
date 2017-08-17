@@ -14,9 +14,8 @@ defmodule SuperCollider do
 end
 
 defmodule OpenSoundControl do
-    def encode([type|data]) do
-
-        encode_string(type) <> encode_flags(data) <> encode_data(data)
+    def encode([addr|data]) do
+        encode_string(addr) <> encode_flags(data) <> encode_data(data)
     end 
         
     def encode_string(msg) do
@@ -40,6 +39,22 @@ defmodule OpenSoundControl do
             end
         end)
         encode_string(str)
+    end
+
+    def encode_data(x) when is_integer(x) do
+        << x :: integer-32>>
+    end
+
+    def encode_data(x) when is_float(x) do
+        << x :: float-32>>
+    end
+
+    def encode_data(x) when is_binary(x) do 
+        encode_string(x)
+    end  
+
+    def encode_data(x) when is_list(x) do 
+        Enum.reduce(x, <<>>, fn(curr, acc) -> acc <> encode_data(curr) end)            
     end
 end
 
