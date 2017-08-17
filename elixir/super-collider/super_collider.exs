@@ -1,0 +1,45 @@
+defmodule SuperCollider do
+    # def connect(port) do
+    #     spawn(fn()-> start() end)    
+    # end
+
+    # def start() do
+    #     {:ok, socket} = :gen_udp.open(port, [:binary])  
+    #     loop(socket)  
+    # end
+
+    # def loop(socket) do
+        
+    # end
+end
+
+defmodule OpenSoundControl do
+    def encode([type|data]) do
+
+        encode_string(type) <> encode_flags(data) <> encode_data(data)
+    end 
+        
+    def encode_string(msg) do
+        len = String.length(msg) 
+        # The string portion should always be a multiple of 4 bytes   
+        case rem(len, 4) do
+            0 -> msg <> <<0,0,0,0>>
+            1 -> msg <> <<0,0,0>>
+            2 -> msg <> <<0,0>>
+            3 -> msg <> <<0>>
+        end
+    end
+
+    def encode_flags(data) do
+        str = Enum.reduce(data, ",", fn(x, acc) -> 
+            case x do
+                x when is_list(x) -> acc <> "s"
+                x when is_integer(x) -> acc <> "i"
+                x when is_binary(x) -> acc <> "s"
+                x when is_float(x) -> acc <> "f"
+            end
+        end)
+        encode_string(str)
+    end
+end
+
