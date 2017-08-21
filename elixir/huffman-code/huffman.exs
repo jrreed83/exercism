@@ -19,6 +19,10 @@ defmodule PriorityQueue do
         add_p(queue, node, [])    
     end
 
+    def priority({_, p}) do
+        p
+    end
+
     # We've gone though everything, the proposed node is
     # the lowest priority
     defp add_p([], node, front) do
@@ -28,10 +32,12 @@ defmodule PriorityQueue do
     defp add_p([h|t], node, front) do
         
         # node is lower priority, so continue
-        add_p(t, node, front ++ [h])
-
-        # node is higher priority than h, so insert
-        front ++ [node] ++ [h|t] 
+        if priority(node) > priority(h) do
+            add_p(t, node, front ++ [h])
+        else
+            # node is higher priority than h, so insert
+            front ++ [node] ++ [h|t]
+        end 
     end
 
 end
