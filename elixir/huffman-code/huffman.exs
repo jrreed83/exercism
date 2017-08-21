@@ -8,6 +8,17 @@ defmodule Huffman do
         end
     end
 
+    def tree(queue) do
+        case length(queue) do
+            1 -> 
+                queue
+            _ ->
+                [n1, n2 | t] = queue
+                nn = merge(n1, n2)
+                queue = PriorityQueue.add(t, nn)
+                tree(queue)
+        end    
+    end
 end
 
 defmodule PriorityQueue do
