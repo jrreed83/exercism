@@ -8,21 +8,24 @@ defmodule Huffman do
         end
     end
 
-    def tree(queue) do
-        case length(queue) do
-            1 -> 
-                # We want to stop when we really have a tree
+    def build_tree(queue) do
+        build_tree(queue, length(queue))
+    end
+
+    def build_tree(queue, n) do
+        case n do
+            1 ->
                 queue
             _ ->
                 # Pop the two least frequently ocurring symbols from the queue
                 [n1, n2 | t] = queue
                 # Merge the two symbols
                 nn = merge(n1, n2)
-                # Add the newly merged symbol to the reduced queue
+                # Add the newly merged symbol to the reduced queue 
                 queue = PriorityQueue.add(t, nn)
                 # Continue
-                tree(queue)
-        end    
+                build_tree(queue, n-1)                
+        end
     end
 
     def unwrap({tree, pattern}) do
@@ -33,6 +36,7 @@ defmodule Huffman do
                 [{x, pattern}]
         end
     end
+
 end
 
 defmodule PriorityQueue do
@@ -40,25 +44,25 @@ defmodule PriorityQueue do
         []
     end
 
-    def add(queue, node) do
-        add_p(queue, node, [])    
-    end
-
     def priority({_, p}) do
         p
     end
 
+    def add(queue, node) do
+        add(queue, node, [])    
+    end
+
     # We've gone though everything, the proposed node is
     # the lowest priority
-    defp add_p([], node, front) do
+    def add([], node, front) do
         front ++ [node]        
     end
 
-    defp add_p([h|t], node, front) do
+    def add([h|t], node, front) do
         
         # node is lower priority, so continue
         if priority(node) > priority(h) do
-            add_p(t, node, front ++ [h])
+            add(t, node, front ++ [h])
         else
             # node is higher priority than h, so insert
             front ++ [node] ++ [h|t]

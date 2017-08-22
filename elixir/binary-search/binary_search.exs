@@ -17,10 +17,10 @@ defmodule BinarySearch do
     def search(tuple, x) do 
         ptr_l = 0
         ptr_r = tuple_size(tuple)-1
-        search_p(tuple, x, ptr_l, ptr_r )
+        search(tuple, x, ptr_l, ptr_r )
     end 
 
-    def search_p(tuple, x, ptr_l, ptr_r) do
+    def search(tuple, x, ptr_l, ptr_r) do
         ptr_m = (ptr_l + ptr_r) >>> 1
         val_m = elem(tuple, ptr_m)
 
@@ -38,9 +38,9 @@ defmodule BinarySearch do
                 x == val_m ->
                     {:ok, ptr_m}
                 x < val_m  -> 
-                    search_p(tuple, x, ptr_l,   ptr_m-1) 
+                    search(tuple, x, ptr_l,   ptr_m-1) 
                 x > val_m  -> 
-                    search_p(tuple, x, ptr_m+1, ptr_r)
+                    search(tuple, x, ptr_m+1, ptr_r)
             end
         end
     end
