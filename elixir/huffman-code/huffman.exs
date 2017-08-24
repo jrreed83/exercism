@@ -28,10 +28,14 @@ defmodule Huffman do
         end
     end
 
-    def unwrap({tree, pattern}) do
+    def build_patterns(tree) do 
+        build_patterns(tree,"")
+    end
+
+    def build_patterns(tree, pattern) do
         case tree do
             [left, right] ->
-                unwrap({left, pattern <> "0"}) ++ unwrap({right, pattern <> "1"})
+                build_patterns(left, pattern <> "0") ++ build_patterns(right, pattern <> "1")
             x ->
                 [{x, pattern}]
         end
