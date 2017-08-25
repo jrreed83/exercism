@@ -32,6 +32,7 @@ defmodule Huffman do
         build_patterns(tree,"")
     end
 
+    # Traverses tree from root
     def build_patterns(tree, pattern) do
         case tree do
             [left, right] ->
