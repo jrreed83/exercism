@@ -8,24 +8,17 @@ defmodule Huffman do
         end
     end
 
-    def build_tree(queue) do
-        build_tree(queue, length(queue))
+    def build_tree([h|[]]) do
+        return h
     end
 
-    def build_tree(queue, n) do
-        case n do
-            1 ->
-                queue
-            _ ->
-                # Pop the two least frequently ocurring symbols from the queue
-                [n1, n2 | t] = queue
-                # Merge the two symbols
-                nn = merge(n1, n2)
-                # Add the newly merged symbol to the reduced queue 
-                queue = PriorityQueue.add(t, nn)
-                # Continue
-                build_tree(queue, n-1)                
-        end
+    def build_tree([h1,h2|t]) do
+        # Merge the two symbols
+        nn = merge(n1, n2)
+        # Add the newly merged symbol to the reduced queue 
+        queue = PriorityQueue.add(t, nn)
+        # Continue
+        build_tree(queue, n-1)         
     end
 
     def build_patterns(tree) do 
