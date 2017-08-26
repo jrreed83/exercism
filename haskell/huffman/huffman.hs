@@ -34,11 +34,18 @@ module Huffman where
     build_tree :: [Node] -> Tree  
     build_tree (h:[]) = tree h
     build_tree list   =
-        build_tree (add t hh) 
+        build_tree new_list 
         where
+            -- Pull front nodes with highest priority
             (h1:h2:t) = list
+            -- 
             hh = merge h1 h2
-
+            new_list = add t hh
+    
+    unwrap :: Tree -> String -> [(String, String)]
+    unwrap (Leaf s) i = [(s,i)]
+    unwrap (Branch l r) i = 
+        unwrap l (i ++ "0") ++ unwrap r (i ++ "1")
 
         
         
