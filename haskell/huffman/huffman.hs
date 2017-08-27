@@ -43,5 +43,9 @@ module Huffman where
             inner (Branch left right) (pattern) = 
                 inner (left) (pattern ++ "0") ++ inner (right) (pattern ++ "1")
 
-        
+    huffman :: [(String, Float)] -> [(String, String)]
+    huffman list = list |> convert |> build_tree |> unwrap 
+
+    (|>) :: a -> (a -> b) -> b
+    (|>) x f = f x
         
