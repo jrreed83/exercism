@@ -26,10 +26,11 @@ module Huffman where
     convert l = map (\(s,f) -> (Node (Leaf s) f)) l
 
     build_tree :: [Node] -> Tree  
-    build_tree (h:[]) = tree h
-    build_tree (list) =
-        build_tree (new_list) 
-        where
+    build_tree (h:[]) 
+        = tree h
+    build_tree (list) 
+        = build_tree (new_list) 
+          where 
             (h1:h2:t) = list
             hh = merge (h1) (h2)
             new_list = add (t) (hh)
