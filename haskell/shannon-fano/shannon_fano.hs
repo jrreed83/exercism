@@ -15,7 +15,7 @@ module ShannonFano where
     update (Histogram l) c 
         = inner l c []
         where 
-            inner []    c accum = Histogram ( (c,1) : accum)
+            inner [] c accum = Histogram ( (c,1) : accum)
             inner ((key,value):t) c accum 
                 | key == c = Histogram ( accum ++ [(key,value+1)] ++ t)
                 | otherwise = inner (t) (c) ((key,value):accum)  
@@ -27,6 +27,10 @@ module ShannonFano where
     (|>) :: a -> (a -> b) -> b 
     (|>) x f = f x
 
+    histogram :: String -> Histogram
+    histogram str 
+        = foldl (\h c -> update h c) (init_histogram) str
+    
     split :: Int -> [a] -> ([a], [a])
     split n list 
         = (take n list, drop n list) 
