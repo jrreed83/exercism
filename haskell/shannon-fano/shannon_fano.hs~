@@ -5,10 +5,10 @@ module ShannonFano where
     instance Show Tree where
        show t = show (to_list t)
     
---    instance Functor Tree where
---       fmap fn Nil = Nil
---       fmap fn (Branch (k,v) left right) 
---          = Nil --Branch (fn (k,v)) (fmap left) (fmap right)
+    instance Functor Tree where
+       fmap fn Nil = Nil
+       fmap fn (Branch (k,v) left right) 
+          = Nil --Branch (fn (k,v)) (fmap left) (fmap right)
 
     init_tree :: Tree 
     init_tree = Nil 
