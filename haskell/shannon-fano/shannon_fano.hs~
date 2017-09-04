@@ -5,10 +5,6 @@ module ShannonFano where
     instance Show Tree where
        show t = show (to_list t)
     
-    instance Functor Tree where
-       fmap fn Nil = Nil
-       fmap fn (Branch (k,v) left right) 
-          = Nil --Branch (fn (k,v)) (fmap left) (fmap right)
 
     init_tree :: Tree 
     init_tree = Nil 
@@ -36,6 +32,18 @@ module ShannonFano where
     histogram :: String -> Tree 
     histogram str = foldl (\t c -> update t c) Nil str
 
+
+    insert :: [(Char,Int)] -> (Char,Int) -> [(Char,Int)]
+    insert []   (k,v) = [(k,v)]
+    insert list (k,v)
+        = inner list (k,v) []
+        where
+        inner []    (k,v) front = front ++ [(k,v)]
+        inner (h:t) (k,v) front
+
+            | v <= snd h = front ++ [(k,v)] ++ (h:t)
+            | otherwise  = inner t (k,v) (front ++ [h]) 
+	
     data Node = Node {char :: Char 
                      ,freq :: Int
                      } deriving Show 
@@ -43,9 +51,6 @@ module ShannonFano where
     (|>) :: a -> (a -> b) -> b 
     (|>) x f = f x
 
-    -- histogram :: String -> Histogram
-    -- histogram str 
-    --     = foldl (\h c -> update h c) (init_histogram) str
     
     split :: Int -> [a] -> ([a], [a])
     split n list 
