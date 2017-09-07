@@ -1,12 +1,10 @@
 module SourceCoding.Histogram (histogram) where
 
-     data Tree a = E | B a (Tree a) (Tree a) deriving Show
+     import Data.List 
 
-     find :: (Eq a) => [(a,b)] -> a -> Maybe b 
-     find []    _  = Nothing
-     find ((key,val):t) x 
-          | x == key   = Just val 
-          | otherwise  = find t x
+     data Tree a = E | B a (Tree a) (Tree a) 
+                   deriving Show
+
 
      update :: (Eq a) => [(a,Int)] -> a -> [(a,Int)] 
      update list x
@@ -18,7 +16,14 @@ module SourceCoding.Histogram (histogram) where
     
 
      histogram :: (Eq a) => [a] -> [(a,Int)] 
-     histogram list = foldl (\hist x -> update hist x) [] list
+     histogram list 
+          = ((sortBy fn) . (foldl (\hist x -> update hist x) [])) list
+          where 
+          fn (k1,cnt1) (k2,cnt2)
+               | cnt1 < cnt2  = GT
+               | cnt1 == cnt2 = EQ
+               | otherwise    = LT
+                     
 
      tree_insert :: (Ord a) => Tree a -> a -> Tree a
      tree_insert E                x = B x E E
@@ -26,28 +31,17 @@ module SourceCoding.Histogram (histogram) where
 	| x < y      = B y (tree_insert left x) right
 	| otherwise  = B y left (tree_insert right x)
 
+     -- Convert list to binary search tree
      list_to_bst :: (Ord a) => [a] -> Tree a
      list_to_bst list = foldl (\tree x -> tree_insert tree x) E list 
 
+     -- In order traversal
      bst_to_list :: (Ord a) => Tree a -> [a]
      bst_to_list E = []
-     bst_to_list B x left right
+     bst_to_list (B x left right)
           = (bst_to_list left) ++ [x] ++ (bst_to_list right) 
 
+     -- Sort using binary search tree
      sort :: (Ord a) => [a] -> [a]
      sort list = (bst_to_list . list_to_bst) list 
- 
---     sort :: [(a,Int)] -> [(a,Int)]
---    insert :: [(Char,Int)] -> (Char,Int) -> [(Char,Int)]
---    insert []   (k,v) = [(k,v)]
---    insert list (k,v)
---        = inner list (k,v) []
---        where
---        inner [] (k,v) front 
---	    = front ++ [(k,v)]
---        inner (h:t) (k,v) front
---            | v <= snd h = front ++ [(k,v)] ++ (h:t)
---            | otherwise  = inner t (k,v) (front ++ [h]) 
---	
---    sort :: [(Char,Int)] -> [(Char,Int)]
---    sort list = foldl (\acc x -> insert acc x) [] list           
+         
