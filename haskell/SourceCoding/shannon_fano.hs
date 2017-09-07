@@ -31,28 +31,27 @@ module SourceCoding.ShannonFano where
     mk_table list
         = inner list "" 
         where 
-        inner (h:[]) pattern = [(fst h, pattern)]
-        inner (list) pattern
+        inner [x]        pattern = [(fst x, pattern)]
+        inner list@(h:t) pattern
             = inner (left) (pattern ++ "0") ++ inner (right) (pattern ++ "1")
             where
-            (h:t)         = list
             i             = opt_split (list)
             (left, right) = split i (list) 
     
-    lookup_ :: [(Char,String)] -> Char -> Maybe String
-    lookup_ tbl c
-        = case filter (\(k,v) -> k == c) tbl of
-              []  -> Nothing
-              h:t -> Just (snd h)
+    find :: (Eq a) => [(a,b)] -> a -> Maybe b
+    find []    c = Nothing
+    find (h:t) c 
+         | fst h == c = Just (snd h)
+         | otherwise  = find t c
+	
               
     encode :: [(Char,String)] -> String -> Maybe String
     encode tbl []  = Nothing
     encode tbl str
        = inner str (Just [])
-       where
-       inner []    accum = accum
-       inner (h:t) accum 
-           = case (lookup_ tbl h) of 
-                 Nothing -> Nothing
-                 Just x -> inner t (do { y <- accum; return (y ++ x)})
+       where  inner []    accum = accum
+              inner (h:t) accum 
+                   = case (find tbl h) of 
+                        Nothing -> Nothing
+                        Just x -> inner t (do { y <- accum; return (y ++ x)})
         
