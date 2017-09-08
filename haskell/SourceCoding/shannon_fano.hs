@@ -1,7 +1,7 @@
 module SourceCoding.ShannonFano where
 	
     import SourceCoding.Histogram
-
+    import Data.List
 
     (|>) :: a -> (a -> b) -> b 
     (|>) x f = f x
@@ -20,18 +20,17 @@ module SourceCoding.ShannonFano where
     
     opt_split :: (Eq a) => [(a,Int)] -> Int
     opt_split list 
-        = [1 .. n] |> map (\i -> (i,fn i)) 
+        = [1 .. n] |> map (\i -> (i,(discrepancy list i))) 
                    |> foldl (\acc x -> if (snd x) < (snd acc) then x else acc) (-1,100)
 		   |> fst
         where n  = (length list) - 1 
-              fn = discrepancy list
     
     mk_table :: (Eq a) => [a] -> [(a, String)]
     mk_table list
-        = inner (histogram list) "" 
-        where inner [x]        pattern = [(fst x, pattern)]
+        = inner (histogram list) [] 
+        where inner [(x,_)]    pattern = [(x, pattern)]
               inner list@(h:t) pattern
-                   = inner (left) (pattern ++ "0") ++ inner (right) (pattern ++ "1")
+                   = (inner left (pattern ++ "0")) ++ (inner right (pattern ++ "1"))
                    where i             = opt_split (list)
                          (left, right) = split i (list) 
     
