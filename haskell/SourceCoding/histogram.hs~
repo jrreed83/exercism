@@ -20,9 +20,9 @@ module SourceCoding.Histogram (histogram) where
           = ((sortBy fn) . (foldl (\hist x -> update hist x) [])) list
           where 
           fn (k1,cnt1) (k2,cnt2)
-               | cnt1 < cnt2  = GT
+               | cnt1 < cnt2  = LT
                | cnt1 == cnt2 = EQ
-               | otherwise    = LT
+               | otherwise    = GT
                      
 
      tree_insert :: (Ord a) => Tree a -> a -> Tree a
