@@ -1,3 +1,5 @@
+{-# LANGUAGE FlexibleInstances #-}
+
 module SourceCoding.Huffman where
 
      import SourceCoding.Histogram
@@ -5,6 +7,7 @@ module SourceCoding.Huffman where
      data Tree a = Leaf a 
                  | Branch (Tree a) (Tree a) 
                  deriving (Show)
+
 
      merge :: (Tree a,Int) -> (Tree a,Int) -> (Tree a,Int)
      merge (t1, p1) (t2, p2) 

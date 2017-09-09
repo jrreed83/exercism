@@ -6,7 +6,16 @@ module SourceCoding.ShannonFano where
     (|>) :: a -> (a -> b) -> b 
     (|>) x f = f x
 
-    
+    data Tree a = Leaf a 
+                | Branch (Tree a) (Tree a) 
+                deriving (Show)
+
+    mk_tree :: (Eq a) => [(a,Int)] -> Tree a
+    mk_tree [(x,_)]    = Leaf x
+    mk_tree list@(h:t) = Branch (mk_tree left) (mk_tree right)
+         where i             = opt_split (list)
+               (left, right) = split i (list) 
+
     split :: Int -> [a] -> ([a], [a])
     split n list 
         = (take n list, drop n list) 
@@ -25,6 +34,12 @@ module SourceCoding.ShannonFano where
 		   |> fst
         where n  = (length list) - 1 
     
+    unwrap :: (Eq a) => Tree a -> [(a,String)]
+    unwrap tree
+         = inner tree []
+         where inner (Leaf x) accum            = [(x,accum)]
+               inner (Branch left right) accum = inner (left) (accum ++ "0") ++ inner (right) (accum ++ "1")
+
     mk_table :: (Eq a) => [a] -> [(a, String)]
     mk_table list
         = inner (histogram list) [] 
@@ -34,20 +49,20 @@ module SourceCoding.ShannonFano where
                    where i             = opt_split (list)
                          (left, right) = split i (list) 
     
-    find :: (Eq a) => [(a,b)] -> a -> Maybe b
-    find []    c = Nothing
-    find (h:t) c 
-         | fst h == c = Just (snd h)
-         | otherwise  = find t c
+    --find :: (Eq a) => [(a,b)] -> a -> Maybe b
+    --find []    c = Nothing
+    --find (h:t) c 
+    --     | fst h == c = Just (snd h)
+    --     | otherwise  = find t c
 	
               
-    encode :: (Eq a) => [(a,String)] -> [a] -> Maybe String
-    encode tbl []   = Nothing
-    encode tbl list
-       = inner list (Just [])
-       where  inner []    accum = accum
-              inner (h:t) accum 
-                   = case (find tbl h) of 
-                          Nothing -> Nothing
-                          Just x -> inner t (do { y <- accum; return (y ++ x)})
+    --encode :: (Eq a) => [(a,String)] -> [a] -> Maybe String
+    --encode tbl []   = Nothing
+    --encode tbl list
+    --   = inner list (Just [])
+    --   where  inner []    accum = accum
+    --          inner (h:t) accum 
+    --               = case (find tbl h) of 
+    --                      Nothing -> Nothing
+    --                      Just x -> inner t (do { y <- accum; return (y ++ x)})
         
