@@ -1,7 +1,13 @@
-module SourceCoding.Histogram (histogram) where
+module SourceCoding.Histogram where
 
      import Data.List 
 
+     (|>) :: a -> (a -> b) -> b 
+     (|>) x f = f x
+
+     data Tree a = Leaf a 
+                 | Branch (Tree a) (Tree a) 
+                 deriving (Show)
 
      update :: (Eq a) => [(a,Int)] -> a -> [(a,Int)] 
      update list x
@@ -21,3 +27,8 @@ module SourceCoding.Histogram (histogram) where
                | cnt1 == cnt2 = EQ
                | otherwise    = GT
          
+     encode :: (Eq a) => Tree a -> [(a,String)]
+     encode tree
+          = inner tree []
+          where inner (Leaf x)            symbol = [(x,symbol)]
+                inner (Branch left right) symbol = inner left (symbol ++ "0") ++ inner right (symbol ++ "1") 

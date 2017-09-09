@@ -3,16 +3,10 @@ module SourceCoding.ShannonFano where
     import SourceCoding.Histogram
     import Data.List
 
-    (|>) :: a -> (a -> b) -> b 
-    (|>) x f = f x
 
-    data Tree a = Leaf a 
-                | Branch (Tree a) (Tree a) 
-                deriving (Show)
-
-    mk_tree :: (Eq a) => [(a,Int)] -> Tree a
-    mk_tree [(x,_)]    = Leaf x
-    mk_tree list@(h:t) = Branch (mk_tree left) (mk_tree right)
+    shannon_fano_tree :: (Eq a) => [(a,Int)] -> Tree a
+    shannon_fano_tree [(x,_)]    = Leaf x
+    shannon_fano_tree list@(h:t) = Branch (shannon_fano_tree left) (shannon_fano_tree right)
          where i             = opt_split (list)
                (left, right) = split i (list) 
 
@@ -23,9 +17,8 @@ module SourceCoding.ShannonFano where
     discrepancy :: [(a,Int)] -> Int -> Int 
     discrepancy list i
         = abs ( m - n )
-        where
-        m = list |> (take i) |> map (\t -> snd t) |> sum
-        n = list |> (drop i) |> map (\t -> snd t) |> sum
+        where m = list |> (take i) |> map (\t -> snd t) |> sum
+              n = list |> (drop i) |> map (\t -> snd t) |> sum
     
     opt_split :: (Eq a) => [(a,Int)] -> Int
     opt_split list 
@@ -33,21 +26,7 @@ module SourceCoding.ShannonFano where
                    |> foldl (\acc x -> if (snd x) < (snd acc) then x else acc) (-1,100)
 		   |> fst
         where n  = (length list) - 1 
-    
-    unwrap :: (Eq a) => Tree a -> [(a,String)]
-    unwrap tree
-         = inner tree []
-         where inner (Leaf x) accum            = [(x,accum)]
-               inner (Branch left right) accum = inner (left) (accum ++ "0") ++ inner (right) (accum ++ "1")
 
-    mk_table :: (Eq a) => [a] -> [(a, String)]
-    mk_table list
-        = inner (histogram list) [] 
-        where inner [(x,_)]    pattern = [(x, pattern)]
-              inner list@(h:t) pattern
-                   = (inner left (pattern ++ "0")) ++ (inner right (pattern ++ "1"))
-                   where i             = opt_split (list)
-                         (left, right) = split i (list) 
     
     --find :: (Eq a) => [(a,b)] -> a -> Maybe b
     --find []    c = Nothing
