@@ -27,21 +27,11 @@ module SourceCoding.ShannonFano where
 		   |> fst
         where n  = (length list) - 1 
 
-    
-    --find :: (Eq a) => [(a,b)] -> a -> Maybe b
-    --find []    c = Nothing
-    --find (h:t) c 
-    --     | fst h == c = Just (snd h)
-    --     | otherwise  = find t c
-	
-              
-    --encode :: (Eq a) => [(a,String)] -> [a] -> Maybe String
-    --encode tbl []   = Nothing
-    --encode tbl list
-    --   = inner list (Just [])
-    --   where  inner []    accum = accum
-    --          inner (h:t) accum 
-    --               = case (find tbl h) of 
-    --                      Nothing -> Nothing
-    --                      Just x -> inner t (do { y <- accum; return (y ++ x)})
-        
+     new_split :: (Eq a) => [(a,Int)] -> ([(a,Int)],[(a,Int)])
+     new_split list
+          = inner list (sum (map (\t -> snd t) list)) [] 0
+          where inner right@(h:t) rsum left lsum
+                     | abs(rsum-lsum) <= abs(new_rsum-new_lsum) = (left,right)
+                     | otherwise    = inner t new_rsum (left ++ [h]) new_lsum
+                     where new_rsum = rsum - (snd h)
+                           new lsum = lsum + (snd h)

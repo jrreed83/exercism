@@ -2,11 +2,12 @@
 
 module SourceCoding.Huffman where
 
-     import SourceCoding.Histogram
+     import SourceCoding.Histogram 
 
      merge :: (Tree a,Int) -> (Tree a,Int) -> (Tree a,Int)
      merge (t1, p1) (t2, p2) 
-         | p1 >= p2  = (Branch t1 t2,p1+p2)
+         -- Greater probability/frequency => Lower priority
+         | p1 >= p2  = (Branch t1 t2,p1+p2) 
          | otherwise = (Branch t2 t1,p1+p2) 
 
      insert :: [(Tree a,Int)] -> (Tree a,Int) -> [(Tree a,Int)]
