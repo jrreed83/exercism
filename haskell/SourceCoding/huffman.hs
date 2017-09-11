@@ -4,6 +4,11 @@ module SourceCoding.Huffman where
 
      import SourceCoding.Histogram 
 
+     huffman_encode :: (Eq a) => [a] -> Maybe String
+     huffman_encode list
+          = encode tbl list
+          where tbl = list |> histogram |> huffman_tree |> tree_unwrap  
+
      merge :: (Tree a,Int) -> (Tree a,Int) -> (Tree a,Int)
      merge (t1, p1) (t2, p2) 
          -- Greater probability/frequency => Lower priority

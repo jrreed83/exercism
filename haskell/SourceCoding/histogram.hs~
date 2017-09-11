@@ -1,4 +1,4 @@
-module SourceCoding.Histogram (histogram) where
+module SourceCoding.Histogram where
 
      import Data.List 
 
@@ -27,8 +27,14 @@ module SourceCoding.Histogram (histogram) where
                | cnt1 == cnt2 = EQ
                | otherwise    = GT
          
-     encode :: (Eq a) => Tree a -> [(a,String)]
-     encode tree
+     tbl_lookup :: (Eq a) => [(a,String)] -> a -> Maybe String
+     tbl_lookup [] x = Nothing
+     tbl_lookup (h:t) x
+          | (fst h) == x = Just (snd h)
+          | otherwise    = tbl_lookup t x     
+
+     tree_unwrap :: (Eq a) => Tree a -> [(a,String)]
+     tree_unwrap tree
           = inner tree []
           where inner (Leaf x)            symbol = [(x,symbol)]
                 inner (Branch left right) symbol = inner left (symbol ++ "0") ++ inner right (symbol ++ "1") 

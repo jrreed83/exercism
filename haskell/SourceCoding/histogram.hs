@@ -27,8 +27,23 @@ module SourceCoding.Histogram where
                | cnt1 == cnt2 = EQ
                | otherwise    = GT
          
-     encode :: (Eq a) => Tree a -> [(a,String)]
-     encode tree
+     tbl_lookup :: (Eq a) => [(a,String)] -> a -> Maybe String
+     tbl_lookup [] x = Nothing
+     tbl_lookup (h:t) x
+          | (fst h) == x = Just (snd h)
+          | otherwise    = tbl_lookup t x     
+
+     encode :: (Eq a) => [(a,String)] -> [a] -> Maybe String 
+     encode tbl list
+          = inner tbl list []
+          where inner tbl []    accum = Just accum
+                inner tbl (h:t) accum
+                     = case tbl_lookup tbl h of
+                            Nothing -> Nothing
+                            Just s  -> inner tbl t (accum ++ s)
+
+     tree_unwrap :: (Eq a) => Tree a -> [(a,String)]
+     tree_unwrap tree
           = inner tree []
           where inner (Leaf x)            symbol = [(x,symbol)]
                 inner (Branch left right) symbol = inner left (symbol ++ "0") ++ inner right (symbol ++ "1") 
