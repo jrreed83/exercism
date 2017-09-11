@@ -33,6 +33,15 @@ module SourceCoding.Histogram where
           | (fst h) == x = Just (snd h)
           | otherwise    = tbl_lookup t x     
 
+     encode :: (Eq a) => [(a,String)] -> [a] -> Maybe String 
+     encode tbl list
+          = inner tbl list []
+          where inner tbl []    accum = Just accum
+                inner tbl (h:t) accum
+                     = case tbl_lookup tbl h of
+                            Nothing -> Nothing
+                            Just s  -> inner tbl t (accum ++ s)
+
      tree_unwrap :: (Eq a) => Tree a -> [(a,String)]
      tree_unwrap tree
           = inner tree []

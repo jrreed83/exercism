@@ -46,4 +46,4 @@ module SourceCoding.Histogram where
      tree_unwrap tree
           = inner tree []
           where inner (Leaf x)            symbol = [(x,symbol)]
-                inner (Branch left right) symbol = inner left (symbol ++ "0") ++ inner right (symbol ++ "1") 
+                inner (Branch left right) symbol = inner left ('0':symbol) ++ inner right ('1':symbol) 
