@@ -9,13 +9,13 @@ module SourceCoding.Huffman where
           = encode tbl list
           where tbl = list |> histogram |> huffman_tree |> tree_unwrap  
 
-     merge :: (Tree a,Int) -> (Tree a,Int) -> (Tree a,Int)
+     merge :: (Fractional b,Ord b) => (Tree a,b) -> (Tree a,b) -> (Tree a,b)
      merge (t1, p1) (t2, p2) 
          -- Greater probability/frequency => Lower priority
          | p1 >= p2  = (Branch t2 t1,p1+p2) 
          | otherwise = (Branch t1 t2,p1+p2) 
 
-     insert :: [(Tree a,Int)] -> (Tree a,Int) -> [(Tree a,Int)]
+     insert :: (Fractional b,Ord b) => [(Tree a,b)] -> (Tree a,b) -> [(Tree a,b)]
      insert list node = 
          inner list node [] 
          where inner []    node accum = accum ++ [node]
@@ -23,7 +23,7 @@ module SourceCoding.Huffman where
                     | (snd h) < (snd node) = inner t node (accum ++ [h])
                     | otherwise            = accum ++ [node] ++ (h:t)
 
-     huffman_tree :: [(a,Int)] -> Tree a  
+     huffman_tree :: (Fractional b, Ord b) => [(a,b)] -> Tree a  
      huffman_tree list 
           = inner (map (\(x,i) -> (Leaf x, i)) list)
           where inner [(tree,_)] = tree

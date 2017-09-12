@@ -8,12 +8,12 @@ module SourceCoding.ShannonFano where
           = encode tbl list
           where tbl = list |> histogram |> shannon_fano_tree |> tree_unwrap    
 
-     shannon_fano_tree :: [(a,Int)] -> Tree a
+     shannon_fano_tree :: (Fractional b, Ord b) => [(a,b)] -> Tree a  
      shannon_fano_tree [(x,_)]    = Leaf x
      shannon_fano_tree list@(h:t) = Branch (shannon_fano_tree left) (shannon_fano_tree right)
           where (left, right) = split (list) 
 
-     split :: [(a,Int)] -> ([(a,Int)],[(a,Int)])
+     split :: (Fractional b, Ord b) => [(a,b)] -> ([(a,b)],[(a,b)])
      split list
           = inner list [] delta
           where inner right@(h:t) left delta
