@@ -3,7 +3,7 @@ module SourceCoding.ShannonFano where
      import SourceCoding.Histogram
      import Data.List
 
-     shannon_fano_encode :: (Eq a) => [a] -> Maybe String
+     shannon_fano_encode :: (Eq a) => [a] -> String
      shannon_fano_encode list
           = encode tbl list
           where tbl = list |> histogram |> shannon_fano_tree |> tree_unwrap    

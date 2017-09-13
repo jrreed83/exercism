@@ -13,9 +13,9 @@ module SourceCoding.Histogram where
      log2 x = logBase 2.0 x 
 
      entropy :: [(a,Float)] -> Float
-     entropy list 
-          = foldl (\acc (_,p) -> acc - p * log2 p) 0.0 list	
+     entropy list = foldl (\acc (_,p) -> acc - p * log2 p) 0.0 list	
  
+
      update :: (Eq a) => [(a,Int)] -> a -> [(a,Int)] 
      update list x
 	 = inner list x []
@@ -37,26 +37,42 @@ module SourceCoding.Histogram where
      
      normalize :: [(a,Int)] -> [(a,Float)]    
      normalize list
-          = map (\(x,f) -> (x, realToFrac f)) list
+          = map (\(x,f) -> (x, (realToFrac f) / total)) list
           where total = foldl (\acc (x,f) -> acc + (realToFrac f)) 0.0 list
 
-     tbl_lookup :: (Eq a) => [(a,String)] -> a -> Maybe String
-     tbl_lookup [] x = Nothing
-     tbl_lookup (h:t) x
+     tbl_lookup_l :: (Eq a) => [(a,b)] -> a -> Maybe b
+     tbl_lookup_l [] x = Nothing
+     tbl_lookup_l (h:t) x
           | (fst h) == x = Just (snd h)
-          | otherwise    = tbl_lookup t x     
+          | otherwise    = tbl_lookup_l t x     
 
-     encode :: (Eq a) => [(a,String)] -> [a] -> Maybe String 
+     tbl_lookup_r :: (Eq b) => [(a,b)] -> b -> Maybe a
+     tbl_lookup_r [] x = Nothing
+     tbl_lookup_r (h:t) x
+          | (snd h) == x = Just (fst h)
+          | otherwise    = tbl_lookup_r t x 
+
+     encode :: (Eq a) => [(a,String)] -> [a] -> String 
      encode tbl list
           = inner tbl list []
-          where inner tbl []    accum = Just accum
-                inner tbl (h:t) accum
-                     = case tbl_lookup tbl h of
-                            Nothing -> Nothing
-                            Just s  -> inner tbl t (accum ++ s)
+          where inner tbl []    accum = accum
+                inner tbl (h:t) accum = case tbl_lookup_l tbl h of
+                                             Nothing -> []
+                                             Just s  -> inner tbl t (accum ++ s)
+
+     decode :: [(a,String)] -> String -> [a]
+     decode tbl str
+          = inner tbl str [] []
+          where inner tbl []    buffer decoded = decoded
+                inner tbl (h:t) buffer decoded = case tbl_lookup_r tbl (buffer ++ [h]) of
+                                                      Nothing -> inner tbl t (buffer ++ [h])  decoded
+                                                      Just x  -> inner tbl t [] (decoded ++ [x])
+     
 
      tree_unwrap :: (Eq a) => Tree a -> [(a,String)]
      tree_unwrap tree
           = inner tree []
           where inner (Leaf x)            symbol = [(x,symbol)]
                 inner (Branch left right) symbol = inner left (symbol ++ ['0']) ++ inner right (symbol ++ ['1']) 
+
+

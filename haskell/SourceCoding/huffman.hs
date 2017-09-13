@@ -4,7 +4,7 @@ module SourceCoding.Huffman where
 
      import SourceCoding.Histogram 
 
-     huffman_encode :: (Eq a) => [a] -> Maybe String
+     huffman_encode :: (Eq a) => [a] -> String
      huffman_encode list
           = encode tbl list
           where tbl = list |> histogram |> huffman_tree |> tree_unwrap  
