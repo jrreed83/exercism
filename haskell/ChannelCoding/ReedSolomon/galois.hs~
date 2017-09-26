@@ -1,0 +1,19 @@
+module ReedSolomon.Galois where
+
+     class Field a where
+          plus    :: a -> a -> a
+          times   :: a -> a -> a
+          one     :: a
+          zero    :: a
+          inverse :: a -> Maybe a
+          negate  :: a -> a
+
+     data Zmod2 = Zmod2 Int 
+
+     instance Show Zmod2 where
+          show (Zmod2 x) = show (mod x 2)
+
+     instance Eq Zmod2 where
+          (==) (Zmod2 x) (Zmod2 y) = (mod (x-y) 2 == 0)
+          (/=) (Zmod2 x) (Zmod2 y) = (mod (x-y) 2 /= 0)
+
