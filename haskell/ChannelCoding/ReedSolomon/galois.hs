@@ -54,22 +54,20 @@ module ReedSolomon.Galois where
      gf_exp 1 = 3
      gf_exp 2 = 5
      gf_exp 3 = 4
-     gf_exp 4 = 3
+     gf_exp 4 = 7
      gf_exp 5 = 2
      gf_exp 6 = 6 
      gf_exp 7 = 1    
+     
 
      (|*|) :: Int -> Int -> Int
      x |*| y 
-          = gf_exp p
+          = gf_exp (mod (gf_logx + gf_logy) 7)
             where gf_logx = gf_log x
                   gf_logy = gf_log y
-                  p    = mod (gf_logx + gf_logy) 7
 
      inverse :: Int -> Int
-     inverse x    
-          = gf_exp m
-            where m = (7 - gf_log x)  
+     inverse x = gf_exp (7 - gf_log x) -- x ^ 7 = 1 for any x
 
      (|/|) :: Int -> Int -> Int
      x |/| y = x |*| (inverse y)
