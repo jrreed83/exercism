@@ -39,6 +39,7 @@ module ReedSolomon.Galois where
      --
 
      import qualified Data.Map as Map 
+     import Data.Bits 
 
      gf_log :: Int -> Int
      gf_log 1 = 0
@@ -71,3 +72,23 @@ module ReedSolomon.Galois where
 
      (|/|) :: Int -> Int -> Int
      x |/| y = x |*| (inverse y)
+
+     (|+|) :: Int -> Int -> Int
+     x |+| y = ((x2.^.y2) .<<. 2) .|. ((x1.^.y1) .<<. 1) .|. (x0.^.y0)
+             where x0 = x.&.1
+                   y0 = y.&.1
+                   x1 = (x.>>.1).&.1 
+                   y1 = (y.>>.1).&.1 
+                   x2 = (x.>>.2).&.1 
+                   y2 = (y.>>.2).&.1 
+
+     (.^.) :: Int -> Int -> Int
+     x .^. y = xor x y
+
+     (.>>.) :: Int -> Int -> Int
+     x .>>. p = shiftR x p
+
+     (.<<.) :: Int -> Int -> Int
+     x .<<. p = shiftL x p 
+
+     -- x^2 + 1 |+| x + 1
