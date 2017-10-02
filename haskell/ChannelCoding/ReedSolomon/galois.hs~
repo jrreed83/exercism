@@ -41,7 +41,9 @@ module ReedSolomon.Galois where
      import qualified Data.Map as Map 
      import Data.Bits 
 
-     gf_log :: Int -> Int
+     type GF = Int 
+
+     gf_log :: GF -> Int
      gf_log 1 = 0
      gf_log 2 = 5
      gf_log 3 = 1
@@ -50,7 +52,7 @@ module ReedSolomon.Galois where
      gf_log 6 = 6
      gf_log 7 = 4
 
-     gf_exp :: Int -> Int 
+     gf_exp :: Int -> GF 
      gf_exp 0 = 1
      gf_exp 1 = 3
      gf_exp 2 = 5
@@ -61,26 +63,29 @@ module ReedSolomon.Galois where
      gf_exp 7 = 1    
      
 
-     (|*|) :: Int -> Int -> Int
+     (|*|) :: GF -> GF -> GF
      x |*| y 
           = gf_exp (mod (gf_logx + gf_logy) 7)
             where gf_logx = gf_log x
                   gf_logy = gf_log y
 
-     inverse :: Int -> Int
+     inverse :: GF -> GF
      inverse x = gf_exp (7 - gf_log x) -- x ^ 7 = 1 for any x
 
-     (|/|) :: Int -> Int -> Int
+     (|/|) :: GF -> GF -> GF
      x |/| y = x |*| (inverse y)
 
-     (|+|) :: Int -> Int -> Int
-     x |+| y = (x2.^.y2) .|. (x1.^.y1) .|. (x0.^.y0)
+     (|+|) :: GF -> GF -> GF
+     x |+| y = ((x2.^.y2) .<<. 2) .|. ((x1.^.y1) .<<. 1) .|. (x0.^.y0)
              where x0 = x.&.1
                    y0 = y.&.1
                    x1 = (x.>>.1).&.1 
                    y1 = (y.>>.1).&.1 
                    x2 = (x.>>.2).&.1 
                    y2 = (y.>>.2).&.1 
+
+     (.**.) :: GF -> Int -> GF
+     x .**. y = gf_exp ( y * (gf_log x) )
 
      (.^.) :: Int -> Int -> Int
      x .^. y = xor x y
