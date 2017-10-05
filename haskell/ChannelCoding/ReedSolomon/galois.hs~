@@ -39,11 +39,12 @@ module ReedSolomon.Galois where
      --
 
      import qualified Data.Map as Map 
-     import Data.Bits 
+     import Data.Bits
+     import Data.Word 
 
-     type GF = Int 
+     type GF8 = Int 
 
-     gf_log :: GF -> Int
+     gf_log :: GF8 -> Int
      gf_log 1 = 0
      gf_log 2 = 5
      gf_log 3 = 1
@@ -52,7 +53,7 @@ module ReedSolomon.Galois where
      gf_log 6 = 6
      gf_log 7 = 4
 
-     gf_exp :: Int -> GF 
+     gf_exp :: Int -> GF8 
      gf_exp 0 = 1
      gf_exp 1 = 3
      gf_exp 2 = 5
@@ -63,21 +64,21 @@ module ReedSolomon.Galois where
      gf_exp 7 = 1    
      
 
-     (|*|) :: GF -> GF -> GF
+     (|*|) :: GF8 -> GF8 -> GF8
      0 |*| _ = 0
      _ |*| 0 = 0
      x |*| y = gf_exp (mod (gf_logx + gf_logy) 7)
              where gf_logx = gf_log x
                    gf_logy = gf_log y
 
-     inverse :: GF -> GF
+     inverse :: GF8 -> GF8
      inverse x = gf_exp (7 - gf_log x) -- x ^ 7 = 1 for any x
 
-     (|/|) :: GF -> GF -> GF
+     (|/|) :: GF8 -> GF8 -> GF8
      0 |/| _ = 0
      x |/| y = x |*| (inverse y)
 
-     (|+|) :: GF -> GF -> GF
+     (|+|) :: GF8 -> GF8 -> GF8
      x |+| y = ((x2.^.y2) .<<. 2) .|. ((x1.^.y1) .<<. 1) .|. (x0.^.y0)
              where x0 = x.&.1
                    y0 = y.&.1
@@ -86,12 +87,7 @@ module ReedSolomon.Galois where
                    x2 = (x.>>.2).&.1 
                    y2 = (y.>>.2).&.1 
 
-     ntimes :: GF -> Int -> GF
-     ntimes x n 
-          | (mod n 2 == 0) = 0
-          | (mod n 2 == 1) = x  
-     
-     (|**|) :: GF -> Int -> GF
+     (|**|) :: GF8 -> Int -> GF8
      0 |**| _ = 0
      x |**| 1 = x 
      x |**| y = gf_exp ( mod (y * gf_log (x)) 7 )
@@ -105,6 +101,17 @@ module ReedSolomon.Galois where
      (.<<.) :: Int -> Int -> Int
      x .<<. p = shiftL x p 
 
-     poly :: GF -> GF
-     poly x = (3 |*| (x |**| 3)) |+| 2
+     byteToBits :: Int -> [Int]
+     byteToBits x
+          = byteToBits' x 8 []
+          where byteToBits' _ 0 l = l
+                byteToBits' x n l = byteToBits' (x .>>. 1) (n-1) (l ++ [x .&. 1]) 
+
+     toBits :: [Int] -> [Int]
+     toBits l = do { x <- l
+                   ; byteToBits x }
+                 
+
+     poly :: GF8 -> GF8
+     poly x = (3 |*| (x |**| 3)) |+| (2 |*| x)
      -- x^2 + 1 |+| x + 1
