@@ -52,6 +52,7 @@ module ReedSolomon.Galois where
      gf_log 5 = 2
      gf_log 6 = 6
      gf_log 7 = 4
+     gf_log x | x > 7 = gf_log (mod x 7)
 
      gf_exp :: Int -> GF8 
      gf_exp 0 = 1
@@ -61,9 +62,26 @@ module ReedSolomon.Galois where
      gf_exp 4 = 7
      gf_exp 5 = 2
      gf_exp 6 = 6 
-     gf_exp 7 = 1    
+     gf_exp 7 = 1  
+     gf_exp x | x > 7 = gf_exp (mod x 7)  
      
+     data GF = GF Int
 
+     instance Show GF where
+          show (GF x) = "GF"++"(" ++ (show (mod x 7)) ++")"
+
+     instance Num GF where
+          (GF x) + (GF y) = GF ( x .^. y )
+          (GF x) * (GF y) = GF ( gf_exp (gf_log x + gf_log y))
+          abs (GF x) = GF x
+                         
+     instance Fractional GF where
+          (GF x) / (GF y) = (GF x) * (GF (gf_exp (7 - gf_log y)))
+
+     instance Eq GF where
+          (GF x) == (GF y) = (mod (abs(x-y)) 7) == 0
+          (GF x) /= (GF y) = (mod (abs(x-y)) 7) /= 0
+ 
      (|*|) :: GF8 -> GF8 -> GF8
      0 |*| _ = 0
      _ |*| 0 = 0
@@ -110,8 +128,8 @@ module ReedSolomon.Galois where
      toBits :: [Int] -> [Int]
      toBits l = do { x <- l
                    ; byteToBits x }
-                 
+     
 
-     poly :: GF8 -> GF8
-     poly x = (3 |*| (x |**| 3)) |+| (2 |*| x)
+     poly :: GF -> GF
+     poly x = (GF(3) * x^3) + (GF(2) * x)  --(3 |*| (x |**| 3)) |+| (2 |*| x)
      -- x^2 + 1 |+| x + 1
