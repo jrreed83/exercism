@@ -92,20 +92,17 @@ module ReedSolomon.Galois where
      (.<<.) :: Int -> Int -> Int
      x .<<. p = shiftL x p 
 
-     byteToBits :: Int -> [Int]
-     byteToBits x
-          = byteToBits' x 8 []
-          where byteToBits' _ 0 l = l
-                byteToBits' x n l = byteToBits' (x .>>. 1) (n-1) (l ++ [x .&. 1]) 
-
-     toBits :: [Int] -> [Int]
-     toBits l = do { x <- l
-                   ; byteToBits x }
-     
-
      poly :: GF -> GF
      poly x = (a3 * x^3) + (a1 * x) + a0 
             where a3 = GF 3
                   a1 = GF 2
                   a0 = GF 1 
      -- x^2 + 1 |+| x + 1
+     --
+     (|*|) :: Int -> Int -> Int
+     x |*| y = 
+          inner y 0 0
+          where inner yi result n 
+                     | yi       == 0 = result
+                     | yi .&. 1 == 0 = inner (yi .>>. 1) result (n+1)
+                     | yi .&. 1 == 1 = inner (yi .>>. 1) (xor result (x .<<. n)) (n+1)
