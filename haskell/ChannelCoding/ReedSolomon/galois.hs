@@ -1,3 +1,5 @@
+{-# LANGUAGE BinaryLiterals #-}
+
 module ReedSolomon.Galois where
 
      -- The field we will first work with is GF(8) ~ Z2/(x^3 + x + 1) = {0,1,x,x^2,x+1,x^2+1,x^2+x,x^2+x+1}
@@ -83,13 +85,13 @@ module ReedSolomon.Galois where
           (GF x) /= (GF y) = (mod (abs(x-y)) 7) /= 0
  
 
-     (.^.) :: Int -> Int -> Int
+     (.^.) :: Integer -> Integer -> Integer
      x .^. y = xor x y
 
-     (.>>.) :: Int -> Int -> Int
+     (.>>.) :: Integer -> Int -> Integer
      x .>>. p = shiftR x p
 
-     (.<<.) :: Int -> Int -> Int
+     (.<<.) :: Integer -> Int -> Integer
      x .<<. p = shiftL x p 
 
      poly :: GF -> GF
@@ -99,10 +101,31 @@ module ReedSolomon.Galois where
                   a0 = GF 1 
      -- x^2 + 1 |+| x + 1
      --
-     (|*|) :: Int -> Int -> Int
+     degree :: Integer -> Int
+     degree 0 = 0
+     degree 1 = 0
+     degree x =
+          degree' x 0
+          where degree' 0 n = (n-1)
+                degree' y i = degree' (y .>>. 1) (i+1)
+
+     order :: Integer -> Int
+     order x = 
+          order' x 1
+          where order' 1 n = n
+                order' y n = order' ((y |*| x) % 13) (n+1)
+    
+     (|*|) :: Integer -> Integer -> Integer
      x |*| y = 
-          inner y 0 0
+          inner y (toInteger 0) 0
           where inner yi result n 
                      | yi       == 0 = result
                      | yi .&. 1 == 0 = inner (yi .>>. 1) result (n+1)
                      | yi .&. 1 == 1 = inner (yi .>>. 1) (xor result (x .<<. n)) (n+1)
+
+     (%) :: Integer -> Integer -> Integer
+     x % y
+          | degree x < degree y = x
+          | otherwise           = (xor x (y .<<. ((degree x) - (degree y)))) % y
+
+-- x + 1 
