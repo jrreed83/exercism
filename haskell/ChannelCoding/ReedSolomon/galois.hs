@@ -1,4 +1,5 @@
 {-# LANGUAGE BinaryLiterals #-}
+{-# LANGUAGE FlexibleInstances #-}
 
 module ReedSolomon.Galois where
 
@@ -42,9 +43,15 @@ module ReedSolomon.Galois where
 
      import qualified Data.Map as Map 
      import Data.Bits
-     import Data.Word 
+     import Data.Word      
 
      type GF8 = Int 
+
+     data Bit = L | H
+
+     instance Show Bit where
+          show L = "0"
+          show H = "1"
 
      gf_log :: GF8 -> Int
      gf_log 1 = 0
@@ -127,5 +134,17 @@ module ReedSolomon.Galois where
      x % y
           | degree x < degree y = x
           | otherwise           = (xor x (y .<<. ((degree x) - (degree y)))) % y
+
+     crcEncode :: Integer -> Integer -> Integer
+     crcEncode genPoly msg = (msg .<<. (degree genPoly)) % genPoly
+
+     crcDecode :: Integer -> Integer -> Integer
+     crcDecode genPoly msg = msg % genPoly
+
+     data Conversion = Bits | Polynomial
+
+     toBits :: Integer -> String
+     toBits 0 = []
+     toBits x = toBits (x .>>. 1) ++ show (x .&. 1) 
 
 -- x + 1 
